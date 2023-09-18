@@ -9,12 +9,13 @@ use App\Entity\Users;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
+
 class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
         //5 categories
-        for ($i=1; $i <= 5 ; $i++) { 
+        for ($i = 1; $i <= 5; $i++) {
             $category = new Categories;
             $category->setName("Categorie $i");
 
@@ -25,35 +26,43 @@ class AppFixtures extends Fixture
 
         //1 User
         $user = new Users;
-        $user->setUsername('testUser');
-        $user->setPassword(password_hash('password', PASSWORD_DEFAULT));
+        $user
+            ->setUsername('testUser')
+            ->setEmail('test@email.fr')
+            ->setRoles($user->getRoles())
+            ->setPassword(password_hash('password', PASSWORD_DEFAULT));
 
         $manager->persist($user);
 
 
 
         //5 articles avec 5 comentaires
-        for ($i=1; $i <= 5 ; $i++) { 
+        for ($i = 1; $i <= 5; $i++) {
             $article = new Articles();
-            $article->setTitle("Article $i");
-            $article->setContent("Contenu de l'article $i");
-            $article->setUser($user);
-            $article->setCategory($categories[array_rand($categories)]);
+            $article
+                ->setTitle("Article $i")
+                ->setContent("Contenu de l'article $i")
+                ->setUser($user)
+                ->setCategory($categories[array_rand($categories)])
+                ->setCreatedAt(new \DateTimeImmutable);
+
 
             $manager->persist($article);
 
-            for ($j=1; $j <= 5 ; $j++) { 
+            for ($j = 1; $j <= 5; $j++) {
                 $comment = new Comments;
-                $comment->setContent("Commentaire $j pour l'article $i");
-                $comment->setUser($user);
-                $comment->setArticle($article);
+                $comment
+                    ->setContent("Commentaire $j pour l'article $i")
+                    ->setUser($user)
+                    ->setArticle($article)
+                    ->setCreatedAt(new \DateTimeImmutable);
 
                 $manager->persist($comment);
             }
         }
 
 
-        
+
         $manager->flush();
     }
 }
